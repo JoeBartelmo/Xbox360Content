@@ -45,6 +45,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="IO.cs" />
     <Compile Include="License and About\About.cs" />
+    <Compile Include="STFS\Metadata\Descriptor.cs" />
     <Compile Include="STFS\Metadata\License.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
