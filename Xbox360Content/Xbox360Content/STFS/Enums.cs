@@ -53,4 +53,26 @@ namespace Xbox360Content.STFS.Enums
         /// </summary>
         Retail = 0x02
     }
+    /// <summary>
+    /// For use with DiscInfo
+    /// </summary>
+    public enum Disc : int
+    {
+        /// <summary>
+        /// Identifies Xbox or PC
+        /// </summary>
+        Platform = 0xff000000,
+        /// <summary>
+        /// Executable type
+        /// </summary>
+        Executable = 0x00ff0000,
+        /// <summary>
+        /// Disc number
+        /// </summary>
+        Number = 0x0000ff00,
+        /// <summary>
+        /// Disc number in included set (series)
+        /// </summary>
+        ID = 0x000000ff
+    }
 }
