@@ -1,0 +1,13 @@
+﻿Below is a list of all references that were used, read, and analyzed during the course of this project. ~Joe
+
+BTW, i was reading posts on a website a while back, my friend was advertising for me, he said I have a 'degree' in C#? That's not true, it's a certification, there is no such thing as a degree, now that that is out of the way.
+
+CRC: 
+http://en.wikipedia.org/wiki/Cyclic_redundancy_check
+http://en.wikipedia.org/wiki/Cyclic_code
+http://www.relisoft.com/Science/CrcMath.html
+http://www.hackersdelight.org/crc.pdf
+
+STFS (prior knowledge used as well):
+http://free60.org/STFS
+http://www.arkem.org/xbox360-file-reference.pdf <-- essentially free60.org with wider explanations
