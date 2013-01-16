@@ -23,10 +23,14 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
 /// <summary>
-/// Alot of these methods are not proper, and they will be replaced in the future, but you are not meant to use them, they are for me in this DLL
+/// A lot of these methods are not proper, and they will be replaced in the future, but you are not meant to use them, they are for me in this DLL
 /// </summary>
 internal static class Extensions
 {
+    internal static byte[] Range(this byte[] bytes, int index, int length)
+    {
+        return bytes.Skip(index).Take(length).ToArray();
+    }
     internal static void MakeFile(this byte[] bytes, string filename, bool useDesktop)
     {
         if (!useDesktop)
@@ -36,7 +40,6 @@ internal static class Extensions
             using (var fs = System.IO.File.Create(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + filename))
                 fs.Write(bytes, 0, bytes.Length);
     }
-
     internal static byte[] SelectSection(this byte[] buffer, int offset, int length)
     {
         byte[] toReturn = new byte[length];
@@ -44,7 +47,6 @@ internal static class Extensions
             toReturn[i - offset] = buffer[i];
         return toReturn;
     }
-
     internal static byte[] ToBytes(this string String, bool Unicode)
     {
         List<byte> bytes = new List<byte>();
@@ -56,7 +58,6 @@ internal static class Extensions
         }
         return bytes.ToArray();
     }
-
     internal static string GetString(this byte[] Bytes, bool HexEditor = false)
     {
         StringBuilder String = new StringBuilder();
@@ -74,7 +75,6 @@ internal static class Extensions
         }
         return String.ToString();//irony :)
     }
-
     internal static bool ContainsAny(this string str, char[] chars)
     {
         foreach (char a in chars)
@@ -84,7 +84,6 @@ internal static class Extensions
         }
         return false;
     }
-
     internal static string ToHex(this byte[] bytes, bool addspace = false)
     {
         StringBuilder sb = new StringBuilder();
@@ -96,7 +95,6 @@ internal static class Extensions
         }
         return sb.ToString();
     }
-
     internal static string[] Split(this string a, int count, bool seperatebyspace = false)
     {
         if (!seperatebyspace)
@@ -133,7 +131,6 @@ internal static class Extensions
             return returned.ToArray();
         }
     }
-
     internal static string ToHexString(this byte[] ByteArray)
     {
         string r = "";
@@ -141,7 +138,6 @@ internal static class Extensions
             r += ByteArray[i].ToString("X2");
         return r;
     }
-
     //we can increase load speeds with math here, better than converting to byte arr, then back to int
     //bitwise:
     //0x00000000
