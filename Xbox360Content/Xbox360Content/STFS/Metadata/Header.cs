@@ -21,13 +21,12 @@ using System.Text;
 
 namespace Xbox360Content.STFS.Metadata
 {
-    internal class Header
+    public class Metadata
     {
-        License[] li;
         /// <summary>
         /// I don't recommend you touch these.
         /// </summary>
-        internal License[] Licenses
+        public License[] Licenses
         {
             get
             {
@@ -41,9 +40,14 @@ namespace Xbox360Content.STFS.Metadata
                     li = value;
             }
         }
-        internal byte[] hash;
-        uint headerSize;
-        int type, version;
+
+        //private variables
+        internal byte[] hash, consoleID;
+        internal uint headerSize, mediaID, tID, saveID, discInfo;
+        internal int type, mversion, update, _base, dataFiles, img1, img2;
+        internal long contentsize, profileID;
+        internal bool descriptorType;
+        License[] li;
 
         /// <summary>
         /// Userfriendly viewing of the type of content
@@ -91,9 +95,9 @@ namespace Xbox360Content.STFS.Metadata
         /// <summary>
         /// Identifies the Metadata Version
         /// </summary>
-        internal bool Version2 { get { return (version == 2); } }
+        public bool Version2 { get { return (mversion == 2); } }
 
-        public Header(ref IO io)
+        public Metadata(ref IO io)
         {
             if (io.Position != 0x22c)
                 io.Seek(0x22c);
@@ -101,7 +105,15 @@ namespace Xbox360Content.STFS.Metadata
             hash = io.ReadBytes(10, Endian.Little);
             headerSize = io.ReadUInt32();
             type = io.ReadInt32();
-            version = io.ReadInt32();
+            mversion = io.ReadInt32();
+            update = io.ReadInt32();
+            _base = io.ReadInt32();
+            tID = io.ReadUInt32();
+            discInfo = io.ReadUInt32();
+            saveID = io.ReadUInt32();
+            consoleID = io.ReadBytes(5, Endian.Little);
+            profileID = io.ReadInt64();
+            
         }
     }
 }
