@@ -47,7 +47,8 @@ namespace Xbox360Content.STFS.Metadata
                     filetable = value;
             }
         }
-
+        internal byte[] Hash;
+        internal int Alloc, Unalloc;
         internal Descriptor(ref IO io)
         {
             if (io.Position != 0x379)
@@ -55,11 +56,22 @@ namespace Xbox360Content.STFS.Metadata
             bytes = io.ReadBytes(0x3, Endian.Little);
             Blocks = io.ReadInt16();
             filetable = io.ReadInt24();
+            Hash = io.ReadBytes(0x4, Endian.Little);
+            Alloc = io.ReadInt32();
+            Unalloc = io.ReadInt32();
         }
         internal Descriptor()
         {
             bytes = new byte[0x24];
             bytes[0] = 0x24;
+        }
+
+        public static implicit operator byte[](Descriptor desc)
+        {
+            List<byte> bytes = new List<byte>(desc.bytes);
+            bytes.AddRange(BitConverter.GetBytes(desc.Blocks));
+            //bytes.AddRange(BitConverter.GetBytes(
+            return null;
         }
     }
 }

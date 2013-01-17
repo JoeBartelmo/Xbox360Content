@@ -56,7 +56,7 @@ namespace Xbox360Content.STFS.Enums
     /// <summary>
     /// For use with DiscInfo
     /// </summary>
-    public enum Disc : int
+    public enum Disc : uint
     {
         /// <summary>
         /// Identifies Xbox or PC

@@ -73,7 +73,7 @@ namespace Xbox360Content
         {
             if (stream != null)
             {
-                _stream = stream;
+                _stream = (Stream)stream;
                 _in = new BinaryReader(_stream);
                 _out = new BinaryWriter(_stream);
                 _ascii = new ASCIIEncoding();
@@ -112,10 +112,7 @@ namespace Xbox360Content
         public IO(byte[] bytes)
         {
             if (bytes != null)
-            {
-                using (MemoryStream ms = new MemoryStream(bytes))
-                    _base(ms);
-            }
+                _base(new MemoryStream(bytes));
             else
                 throw new ArgumentNullException();
         }
@@ -130,8 +127,7 @@ namespace Xbox360Content
             if (bytes != null)
             {
                 Endianness = endian;
-                using (MemoryStream ms = new MemoryStream(bytes))
-                    _base(ms);
+                _base(new MemoryStream(bytes));
             }
             else
                 throw new ArgumentNullException();
@@ -144,10 +140,7 @@ namespace Xbox360Content
         public IO(string file)
         {
             if (File.Exists(file))
-            {
-                using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite))
-                    _base(fs);
-            }
+                _base(new FileStream(file, FileMode.Open, FileAccess.ReadWrite));
             else
                 throw new FileNotFoundException();
         }
@@ -162,8 +155,7 @@ namespace Xbox360Content
             if (File.Exists(file))
             {
                 Endianness = endian;
-                using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite))
-                    _base(fs);
+                _base(new FileStream(file, FileMode.Open, FileAccess.ReadWrite));
             }
             else
                 throw new FileNotFoundException();
@@ -475,17 +467,16 @@ namespace Xbox360Content
         /// <returns></returns>
         public string ReadZString(Endian endian)
         {
-            List<byte> bytes = new List<byte>();
-            byte i;
+            StringBuilder sb = new StringBuilder();
             while (this.Position < this.Length)
             {
-                i = this.ReadByte();
-                if (i == (byte)0)
+                byte b = this.ReadByte();
+                if (b > 0)
+                    sb.Append((char)b);
+                else
                     break;
-                else bytes.Add(i);
             }
-            if (endian == Endian.Big) bytes.Reverse();
-            return _ascii.GetString(bytes.ToArray());
+            return (endian == Endian.Big) ? (sb.ToString().Reverse().ToString()) : sb.ToString();
         }
         /// <summary>
         /// This funciton will determine the integer
