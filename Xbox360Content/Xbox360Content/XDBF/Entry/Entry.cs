@@ -18,17 +18,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Xbox360Content.XDBF.Enums;
 
-namespace Xbox360Content
+namespace Xbox360Content.XDBF
 {
-    //Thrown in for beauty, no other reason really.
+    /// <summary>
+    /// Structure for the Entry table in XBDF file
+    /// </summary>
+    public class Entry
+    {
+        internal uint length, specifier;
+        internal ushort _nameID;
+        internal ulong id;
 
-    /// <summary>
-    /// Thrown when XDBF System runs through, and reports an error
-    /// </summary>
-    public class XDBFException : Exception { public XDBFException(string exception) : base("XBDFEXCEPTION: " + exception) { } }
-    /// <summary>
-    /// Thrown when the STFS system runs through, and reports an error
-    /// </summary>
-    public class STFSException : Exception { public STFSException(string exception) : base("STFSEXCEPTION: " + exception) { } }
+        public uint Offset { get { return specifier; } }
+        public uint Length { get { return length; } }
+        
+        public Entry(ref IO io)
+        {
+            _nameID = io.ReadUInt16();
+            id = io.ReadUInt64();
+            specifier = io.ReadUInt32();
+            length = io.ReadUInt32();
+        }
+    }
 }

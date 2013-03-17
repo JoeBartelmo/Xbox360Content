@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,18 +46,28 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="IO.cs" />
     <Compile Include="License and About\About.cs" />
-    <Compile Include="STFS\Metadata\Descriptor.cs" />
     <Compile Include="STFS\Metadata\License.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="STFS\Enums.cs" />
     <Compile Include="STFS\Metadata\Header.cs" />
+    <Compile Include="STFS\Metadata\Version1.cs" />
+    <Compile Include="XDBF\Entry\Entry.cs" />
+    <Compile Include="XDBF\Entry\GPDTypes\Achievment.cs" />
+    <Compile Include="XDBF\Entry\GPDTypes\Image.cs" />
+    <Compile Include="XDBF\Entry\GPDTypes\Settings.cs" />
+    <Compile Include="XDBF\Entry\GPDTypes\Title.cs" />
+    <Compile Include="XDBF\Enum.cs" />
+    <Compile Include="XDBF\Entry\GPD.cs" />
+    <Compile Include="XDBF\XDBF.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="License and About\GNU General Public License.txt" />
     <Content Include="Sources.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Diagram.cd" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

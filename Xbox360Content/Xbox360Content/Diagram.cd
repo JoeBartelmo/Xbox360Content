@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="Xbox360Content.Cryptography.Crc32" Collapsed="true">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Cryptography\CRC32.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Xbox360Content.XDBFException" Collapsed="true">
+    <Position X="7.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exceptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Xbox360Content.STFSException" Collapsed="true">
+    <Position X="9.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exceptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Xbox360Content.IO" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAQCACAAAAgiaABEgABgAAADAUCAAEAZgEMAABA=</HashCode>
+      <FileName>IO.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Xbox360Content.About" Collapsed="true">
+    <Position X="6" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAEAAAAAAAACAA=</HashCode>
+      <FileName>License and About\About.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Xbox360Content.Log" Collapsed="true">
+    <Position X="7.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAgAAAAAAAAACAACAAAAEAAAA=</HashCode>
+      <FileName>Logging.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Extensions" Collapsed="true">
+    <Position X="9.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAiAAAAAAgAABEAABAAAAAAQAEAAAAEAAAAAAAA=</HashCode>
+      <FileName>Extensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Xbox360Content.STFS.Metadata.Header" Collapsed="true">
+    <Position X="3.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAggACACAAAAAAAAAAABAAAABAAQAAAAAAA=</HashCode>
+      <FileName>STFS\Metadata\Header.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Xbox360Content.STFS.Metadata.Version1" Collapsed="true">
+    <Position X="3.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>STFS\Metadata\Version1.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Xbox360Content.XDBF.Entry" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAAEAAAABAAAAAAAAAAAAAAAAAggA=</HashCode>
+      <FileName>XDBF\Entry\Entry.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Xbox360Content.XDBF.XDBF" Collapsed="true">
+    <Position X="6" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gACAAAAAUAAgEAgAAAAAAAAAIAAAAAAEAAAAAAAAAAg=</HashCode>
+      <FileName>XDBF\XDBF.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Xbox360Content.XDBF.GPD.GPD" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XDBF\Entry\GPD.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="Xbox360Content.STFS.Metadata.License" Collapsed="true">
+    <Position X="7.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAFCAAAAAAgAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>STFS\Metadata\License.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Xbox360Content.XDBF.GPD.Achievement" Collapsed="true">
+    <Position X="6" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BGAAFKAAAgAAAAAAAEAIACQAIUAAAQAAAAAQEAAAAEA=</HashCode>
+      <FileName>XDBF\Entry\GPDTypes\Achievment.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Xbox360Content.XDBF.GPD.Setting" Collapsed="true">
+    <Position X="9.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAoAAAAIAAAAAACAAAEAAYAAAABAAAAAAACAAARA=</HashCode>
+      <FileName>XDBF\Entry\GPDTypes\Settings.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="Xbox360Content.Endian" Collapsed="true">
+    <Position X="9.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>IO.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Xbox360Content.STFS.Enums.Signature" Collapsed="true">
+    <Position X="6" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAEAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>STFS\Enums.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Xbox360Content.STFS.Enums.ConsoleType" Collapsed="true">
+    <Position X="7.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>STFS\Enums.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Xbox360Content.XDBF.GPD.Enums.AchievementTypes" Collapsed="true">
+    <Position X="6" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hgAAAgAAAAAAAgAAAAAAAAACAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XDBF\Entry\GPDTypes\Achievment.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Xbox360Content.XDBF.GPD.Enums.SettingTypes" Collapsed="true">
+    <Position X="9.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAgAAAAAAgAAAAAAAIAACAAQAEAIAAAAgAAA=</HashCode>
+      <FileName>XDBF\Entry\GPDTypes\Settings.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Xbox360Content.XDBF.Enums.GPDID" Collapsed="true">
+    <Position X="7.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAQAEAAAAAAAAAABAAAAEAAABAAAA=</HashCode>
+      <FileName>XDBF\Enum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Xbox360Content.XDBF.Enums.SPAID" Collapsed="true">
+    <Position X="7.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAEAAA=</HashCode>
+      <FileName>XDBF\Enum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Xbox360Content.XDBF.Enums.GPDData" Collapsed="true">
+    <Position X="6" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIQCBAAQAQAAIACwBCAlBAEYAZoAAAFAAkIgAQQAAbE=</HashCode>
+      <FileName>XDBF\Enum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

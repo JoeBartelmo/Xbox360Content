@@ -1,4 +1,4 @@
-﻿/*  Copyright (C) 2012 Joseph Bartelmo
+﻿/*  Copyright (C) 2013 Joseph Bartelmo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,14 +23,13 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
 /// <summary>
-/// A lot of these methods are not proper, and they will be replaced in the future, but you are not meant to use them, they are for me in this DLL
+/// For use inside my DLL
 /// </summary>
 internal static class Extensions
 {
-    internal static byte[] Range(this byte[] bytes, int index, int length)
-    {
-        return bytes.Skip(index).Take(length).ToArray();
-    }
+    private static ASCIIEncoding ascii = new ASCIIEncoding();
+    private static UnicodeEncoding unicode = new UnicodeEncoding();
+    //good
     internal static void MakeFile(this byte[] bytes, string filename, bool useDesktop)
     {
         if (!useDesktop)
@@ -40,41 +39,19 @@ internal static class Extensions
             using (var fs = System.IO.File.Create(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + filename))
                 fs.Write(bytes, 0, bytes.Length);
     }
-    internal static byte[] SelectSection(this byte[] buffer, int offset, int length)
+    //good
+    internal static byte[] SubArray(this byte[] buffer, int offset, int length)
     {
         byte[] toReturn = new byte[length];
-        for (int i = offset; i < offset + length; i++)
-            toReturn[i - offset] = buffer[i];
+        Array.Copy(buffer, offset, toReturn, 0, length);
         return toReturn;
     }
-    internal static byte[] ToBytes(this string String, bool Unicode)
+    //good
+    internal static string GetString(this byte[] Bytes, bool Unicode)
     {
-        List<byte> bytes = new List<byte>();
-        foreach (char a in String)
-        {
-            bytes.Add((byte)a);
-            if (Unicode)
-                bytes.Add(0);
-        }
-        return bytes.ToArray();
+        return Unicode ? unicode.GetString(Bytes) : ascii.GetString(Bytes);
     }
-    internal static string GetString(this byte[] Bytes, bool HexEditor = false)
-    {
-        StringBuilder String = new StringBuilder();
-        foreach (byte a in Bytes)
-        {
-            if (HexEditor)
-            {
-                if (a == 0)
-                    String.Append('.');
-                else
-                    String.Append((char)a);
-            }
-            else
-                String.Append((char)a);
-        }
-        return String.ToString();//irony :)
-    }
+    //good
     internal static bool ContainsAny(this string str, char[] chars)
     {
         foreach (char a in chars)
@@ -84,60 +61,10 @@ internal static class Extensions
         }
         return false;
     }
-    internal static string ToHex(this byte[] bytes, bool addspace = false)
-    {
-        StringBuilder sb = new StringBuilder();
-        foreach (byte a in bytes)
-        {
-            if (addspace)
-                sb.Append(" ");
-            sb.Append(a.ToString("X2"));
-        }
-        return sb.ToString();
-    }
-    internal static string[] Split(this string a, int count, bool seperatebyspace = false)
-    {
-        if (!seperatebyspace)
-        {
-            List<string> returned = new List<string>();
-            for (int i = 0; i < a.Length; i += count)
-            {
-                try
-                { returned.Add(a.Substring(i, count)); }
-                catch
-                { returned.Add(a.Substring(i, (a.Length - i))); }
-            }
-            return returned.ToArray();
-        }
-        else
-        {
-            List<string> returned = new List<string>();
-            int c = count;
-            for (int i = 0; i < a.Length; i += c)
-            {
-                try
-                {
-                    char[] substring = a.Substring(i, count).ToCharArray();
-                    int offset = -1;
-                    for (int x = substring.Length; x > 0; x--)
-                        if (substring[x] == ' ')
-                            offset = x;
-                    returned.Add(a.Substring(i, offset));
-                    c = (offset + 1);
-                }
-                catch
-                { returned.Add(a.Substring(i, (a.Length - i))); }
-            }
-            return returned.ToArray();
-        }
-    }
-    internal static string ToHexString(this byte[] ByteArray)
-    {
-        string r = "";
-        for (int i = 0; i < ByteArray.Length; i++)
-            r += ByteArray[i].ToString("X2");
-        return r;
-    }
+    //good
+    internal static string ToHex(this byte[] ByteArray) { return BitConverter.ToString(ByteArray).Replace("-", ""); }
+    
+    //all good
     //we can increase load speeds with math here, better than converting to byte arr, then back to int
     //bitwise:
     //0x00000000
@@ -194,20 +121,42 @@ internal static class Extensions
                 ((i & 0x000000ff00000000L) >> 8) |
                 ((i & 0x0000ff0000000000L) >> 24) |
                 ((i & 0x00ff000000000000L) >> 40) |
-                ((i & (long)0xff00000000000000L) >> 56);//number too large >.> had to run an unchecked conversion
+                ((long)((ulong)i & 0xff00000000000000L) >> 56);//number too large >.> had to run a sloppy unchecked conversion
         }
     }
     internal static ulong SwapEndian(this ulong i)
     {
         //oh boy, i hope i counted right
         return (ulong)(
-            ((i & 0x00000000000000ffL) << 56) |
-            ((i & 0x000000000000ff00L) << 40) |
-            ((i & 0x0000000000ff0000L)) << 24 |
-            ((i & 0x00000000ff000000L) << 8) |
-            ((i & 0x000000ff00000000L)) >> 8 |
-            ((i & 0x0000ff0000000000L) >> 24) |
-            ((i & 0x00ff000000000000L)) >> 40 |
-            ((i & 0xff00000000000000L) >> 56));
+            ((i & 0x00000000000000ffuL) << 56) |
+            ((i & 0x000000000000ff00uL) << 40) |
+            ((i & 0x0000000000ff0000uL)) << 24 |
+            ((i & 0x00000000ff000000uL) << 8) |
+            ((i & 0x000000ff00000000uL)) >> 8 |
+            ((i & 0x0000ff0000000000uL) >> 24) |
+            ((i & 0x00ff000000000000uL)) >> 40 |
+            ((i & 0xff00000000000000uL) >> 56));
     }
+    internal static double SwapEndian(this double i)
+    {
+        byte[] bytes = BitConverter.GetBytes(i);
+        Array.Reverse(bytes);
+        return BitConverter.ToDouble(bytes, 0);
+    }
+    internal static float SwapEndian(this float i)
+    {
+        byte[] bytes = BitConverter.GetBytes(i);
+        Array.Reverse(bytes);
+        return BitConverter.ToSingle(bytes, 0);
+    }
+    //all good
+    internal static byte[] ToBytes(this float i, bool BigEndian) { return BitConverter.GetBytes(BigEndian ? i.SwapEndian() : i); }
+    internal static byte[] ToBytes(this double i, bool BigEndian) { return BitConverter.GetBytes(BigEndian ? i.SwapEndian() : i); }
+    internal static byte[] ToBytes(this int i, bool BigEndian) { return BitConverter.GetBytes(BigEndian ? i.SwapEndian() : i); }
+    internal static byte[] ToBytes(this uint i, bool BigEndian) { return BitConverter.GetBytes(BigEndian ? i.SwapEndian() : i); }
+    internal static byte[] ToBytes(this long i, bool BigEndian) { return BitConverter.GetBytes(BigEndian ? i.SwapEndian() : i); }
+    internal static byte[] ToBytes(this ulong i, bool BigEndian) { return BitConverter.GetBytes(BigEndian ? i.SwapEndian() : i); }
+    internal static byte[] ToBytes(this short i, bool BigEndian) { return BitConverter.GetBytes(BigEndian ? i.SwapEndian() : i); }
+    internal static byte[] ToBytes(this ushort i, bool BigEndian) { return BitConverter.GetBytes(BigEndian ? i.SwapEndian() : i); }
+    internal static byte[] ToBytes(this string String, bool Unicode){ return Unicode ? unicode.GetBytes(String) : ascii.GetBytes(String); }
 }

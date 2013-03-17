@@ -19,16 +19,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Xbox360Content
+namespace Xbox360Content.XDBF.GPD
 {
-    //Thrown in for beauty, no other reason really.
-
-    /// <summary>
-    /// Thrown when XDBF System runs through, and reports an error
-    /// </summary>
-    public class XDBFException : Exception { public XDBFException(string exception) : base("XBDFEXCEPTION: " + exception) { } }
-    /// <summary>
-    /// Thrown when the STFS system runs through, and reports an error
-    /// </summary>
-    public class STFSException : Exception { public STFSException(string exception) : base("STFSEXCEPTION: " + exception) { } }
+    public struct Image
+    {
+        public static System.Drawing.Image LoadImage(int offset, int length, ref Xbox360Content.IO io)
+        {
+            io.Position = offset;
+            return System.Drawing.Image.FromStream(new System.IO.MemoryStream(io.ReadBytes(length)));
+        }
+    }
 }

@@ -1,4 +1,4 @@
-﻿/*  Copyright (C) 2012 Joseph Bartelmo
+﻿/*  Copyright (C) 2013 Joseph Bartelmo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,27 +52,5 @@ namespace Xbox360Content.STFS.Enums
         /// Constant retail.
         /// </summary>
         Retail = 0x02
-    }
-    /// <summary>
-    /// For use with DiscInfo
-    /// </summary>
-    public enum Disc : uint
-    {
-        /// <summary>
-        /// Identifies Xbox or PC
-        /// </summary>
-        Platform = 0xff000000,
-        /// <summary>
-        /// Executable type
-        /// </summary>
-        Executable = 0x00ff0000,
-        /// <summary>
-        /// Disc number
-        /// </summary>
-        Number = 0x0000ff00,
-        /// <summary>
-        /// Disc number in included set (series)
-        /// </summary>
-        ID = 0x000000ff
     }
 }

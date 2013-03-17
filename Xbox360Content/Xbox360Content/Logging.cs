@@ -1,4 +1,4 @@
-﻿/*  Copyright (C) 2012 Joseph Bartelmo
+﻿/*  Copyright (C) 2013 Joseph Bartelmo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ namespace Xbox360Content
             }
         }
 
-        public static void PrintLocal(string directory)
+        public static void Dump(string directory)
         {
             System.IO.File.WriteAllText(directory + "\\Log.txt", temp);
             temp = string.Empty;

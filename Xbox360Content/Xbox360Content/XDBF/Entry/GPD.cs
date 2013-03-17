@@ -18,17 +18,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Xbox360Content.XDBF.Enums;
 
-namespace Xbox360Content
+namespace Xbox360Content.XDBF.GPD
 {
-    //Thrown in for beauty, no other reason really.
-
     /// <summary>
-    /// Thrown when XDBF System runs through, and reports an error
+    /// Structure for the Entry table in XBDF file
     /// </summary>
-    public class XDBFException : Exception { public XDBFException(string exception) : base("XBDFEXCEPTION: " + exception) { } }
-    /// <summary>
-    /// Thrown when the STFS system runs through, and reports an error
-    /// </summary>
-    public class STFSException : Exception { public STFSException(string exception) : base("STFSEXCEPTION: " + exception) { } }
+    public class GPD : Entry
+    {
+        public GPDID ID { get { return (GPDID)base._nameID; } }
+        public GPDData DataType { get { return (GPDData)base.id; } } 
+        
+        public GPD(ref IO io) : base(ref io) { }
+    }
 }

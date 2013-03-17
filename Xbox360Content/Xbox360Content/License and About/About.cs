@@ -23,7 +23,7 @@ namespace Xbox360Content
 {
     public static class About
     {
-        public static readonly string Disclaimer = @"Copyright (C) 2012 Joseph Bartelmo
+        public static readonly string Disclaimer = @"Copyright (C) 2013 Joseph Bartelmo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

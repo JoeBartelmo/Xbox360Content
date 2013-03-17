@@ -23,7 +23,7 @@ using System.IO;
 namespace Xbox360Content
 {
     /// <summary>
-    /// Enumeration for type of Endian (reversed bits or not)
+    /// Enumeration for type of Endian
     /// </summary>
     public enum Endian : byte
     {
@@ -73,7 +73,7 @@ namespace Xbox360Content
         {
             if (stream != null)
             {
-                _stream = (Stream)stream;
+                _stream = stream;
                 _in = new BinaryReader(_stream);
                 _out = new BinaryWriter(_stream);
                 _ascii = new ASCIIEncoding();
@@ -112,7 +112,10 @@ namespace Xbox360Content
         public IO(byte[] bytes)
         {
             if (bytes != null)
-                _base(new MemoryStream(bytes));
+            {
+                using (MemoryStream ms = new MemoryStream(bytes))
+                    _base(ms);
+            }
             else
                 throw new ArgumentNullException();
         }
@@ -127,7 +130,8 @@ namespace Xbox360Content
             if (bytes != null)
             {
                 Endianness = endian;
-                _base(new MemoryStream(bytes));
+                using (MemoryStream ms = new MemoryStream(bytes))
+                    _base(ms);
             }
             else
                 throw new ArgumentNullException();
@@ -140,7 +144,10 @@ namespace Xbox360Content
         public IO(string file)
         {
             if (File.Exists(file))
-                _base(new FileStream(file, FileMode.Open, FileAccess.ReadWrite));
+            {
+                using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite))
+                    _base(fs);
+            }
             else
                 throw new FileNotFoundException();
         }
@@ -155,7 +162,8 @@ namespace Xbox360Content
             if (File.Exists(file))
             {
                 Endianness = endian;
-                _base(new FileStream(file, FileMode.Open, FileAccess.ReadWrite));
+                using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite))
+                    _base(fs);
             }
             else
                 throw new FileNotFoundException();
@@ -193,7 +201,7 @@ namespace Xbox360Content
         /// <returns>unsigned byte array</returns>
         public byte[] ReadBytes(int count)
         {
-            return ReadBytes(count, this.Endianness);
+            return ReadBytes(count, Endian.Little);
         }
         /// <summary>
         /// Reads a byte
@@ -279,7 +287,7 @@ namespace Xbox360Content
         /// <returns>signed int24</returns>
         public int ReadInt24()
         {
-            List<byte> bytes = new List<byte>(ReadBytes(3, this.type));
+            List<byte> bytes = new List<byte>(ReadBytes(3, Endianness));
             bytes.Add(0);
             return BitConverter.ToInt32(bytes.ToArray(), 0);
         }
@@ -383,7 +391,7 @@ namespace Xbox360Content
         /// </summary>
         /// <param name="endian"></param>
         /// <returns>Decimal</returns>
-        public double ReadDecimal(Endian endian)
+        public double ReadDouble(Endian endian)
         {
             ReadBytes(0x4, endian);
             return BitConverter.ToDouble(temp, 0);
@@ -392,7 +400,7 @@ namespace Xbox360Content
         /// Read Decimal value
         /// </summary>
         /// <returns>Decimal</returns>
-        public double ReadDecimal()
+        public double ReadDouble()
         {
             ReadBytes(0x4, Endianness);
             return BitConverter.ToDouble(temp, 0);
@@ -404,7 +412,7 @@ namespace Xbox360Content
         /// <returns>Char</returns>
         public char ReadChar(Endian endian)
         {
-            return (char)ReadInt16(endian);
+            return (char)ReadUInt16(endian);
         }
         /// <summary>
         /// Read Char Value
@@ -431,7 +439,7 @@ namespace Xbox360Content
         /// <returns>String</returns>
         public string ReadString(int count, bool unicode)
         {
-            return ReadString(count, unicode, this.type);
+            return ReadString(count, unicode, Endianness);
         }
         /// <summary>
         /// Attempts to interpret the string type
@@ -465,18 +473,34 @@ namespace Xbox360Content
         /// </summary>
         /// <param name="endian"></param>
         /// <returns></returns>
-        public string ReadZString(Endian endian)
+        public string ReadZString(bool unicode)
         {
-            StringBuilder sb = new StringBuilder();
-            while (this.Position < this.Length)
+            if (!unicode)
             {
-                byte b = this.ReadByte();
-                if (b > 0)
-                    sb.Append((char)b);
-                else
-                    break;
+                List<byte> bytes = new List<byte>();
+                byte i;
+                while (this.Position < this.Length)
+                {
+                    i = this.ReadByte();
+                    if (i == (byte)0)
+                        break;
+                    else bytes.Add(i);
+                }
+                return _ascii.GetString(bytes.ToArray());
             }
-            return (endian == Endian.Big) ? (sb.ToString().Reverse().ToString()) : sb.ToString();
+            else
+            {
+                List<char> chars = new List<char>();
+                ushort i = 0;
+                while (this.Position < this.Length)
+                {
+                    i = this.ReadUInt16();
+                    if (i == (ushort)0x0000)
+                        break;
+                    else chars.Add((char)i);
+                }
+                return new string(chars.ToArray());
+            }
         }
         /// <summary>
         /// This funciton will determine the integer
@@ -512,7 +536,7 @@ namespace Xbox360Content
                     obj = ReadChar(endian);
                     return;
                 case TypeCode.Decimal:
-                    obj = ReadDecimal(endian);
+                    obj = ReadDouble(endian);
                     return;
                 case TypeCode.Int16:
                     obj = ReadInt16(endian);
@@ -570,7 +594,7 @@ namespace Xbox360Content
                     obj = ReadChar(this.type);
                     return;
                 case TypeCode.Decimal:
-                    obj = ReadDecimal(this.type);
+                    obj = ReadDouble(this.type);
                     return;
                 case TypeCode.Int16:
                     obj = ReadInt16(this.type);
