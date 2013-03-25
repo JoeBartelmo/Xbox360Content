@@ -32,6 +32,8 @@ internal static class Extensions
     //good
     internal static void MakeFile(this byte[] bytes, string filename, bool useDesktop)
     {
+        if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(useDesktop ? Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + filename : System.IO.Path.GetDirectoryName(filename))))
+            System.IO.Directory.CreateDirectory(useDesktop ? (Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + System.IO.Path.GetDirectoryName(filename)) : System.IO.Path.GetDirectoryName(filename));
         if (!useDesktop)
             using (var fs = System.IO.File.Create(filename))
                 fs.Write(bytes, 0, bytes.Length);
@@ -158,5 +160,25 @@ internal static class Extensions
     internal static byte[] ToBytes(this ulong i, bool BigEndian) { return BitConverter.GetBytes(BigEndian ? i.SwapEndian() : i); }
     internal static byte[] ToBytes(this short i, bool BigEndian) { return BitConverter.GetBytes(BigEndian ? i.SwapEndian() : i); }
     internal static byte[] ToBytes(this ushort i, bool BigEndian) { return BitConverter.GetBytes(BigEndian ? i.SwapEndian() : i); }
-    internal static byte[] ToBytes(this string String, bool Unicode){ return Unicode ? unicode.GetBytes(String) : ascii.GetBytes(String); }
+    internal static byte[] ToBytes(this string String, bool Unicode, bool bigEndian){
+
+        if (!bigEndian)
+            return Unicode ? unicode.GetBytes(String) : ascii.GetBytes(String);
+        else
+        {
+            if (!Unicode) return ascii.GetBytes(String);
+            unchecked
+            {
+                char[] chars = String.ToCharArray();
+                ushort a = 0;
+                for (int i = 0; i < chars.Length; i++)
+                {
+                    a = (ushort)((ushort)chars[i] >> 8);
+                    a ^= (ushort)(((ushort)chars[i] & 0xff) << 8);
+                    chars[i] = (char)a;
+                }
+                return (new string(chars)).ToBytes(true, false);
+            }
+        }
+    }
 }

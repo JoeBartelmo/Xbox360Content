@@ -30,19 +30,68 @@ namespace Xbox360Content.XDBF.GPD
             UnlockedNeedstoSync = 2,
             AwardUnlockedNeedsDownload = 0x10
         }
+        public enum ImageType
+        {
+            Icon,
+            LargeBoxArt,
+            SmallBoxArt,
+            Banner,
+            MarketPlace
+        }
     }
     /// <summary>
     /// Structure for the Entry table in XBDF file
     /// </summary>
     public struct Title
     {
+        public Entry Entry;
         bool bigEndian;
         uint titleID;
         int[] gscore;
         byte[] avatar;
-        uint flags;
+        byte[] flags;
         long playtime;
-        string name;
+
+        /// <summary>
+        /// Downloads Image from the internet
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public System.Drawing.Image GetImage(ImageType type)
+        {
+            using (System.Net.WebClient wc = new System.Net.WebClient())
+            {
+                switch (type)
+                {
+                    case ImageType.Banner:
+                        if (System.IO.File.Exists(About.Directory + "banner_t" + titleID.ToString("x2")))
+                            return System.Drawing.Image.FromStream(new System.IO.FileStream(About.Directory + "banner_t" + titleID.ToString("x2"), System.IO.FileMode.Open));
+                        wc.DownloadData("http://avatar.xboxlive.com/global/t." + titleID.ToString("x8") + "/marketplace/0/1").MakeFile(About.Directory + "banner_t" + titleID.ToString("x2"), false);
+                        return System.Drawing.Image.FromStream(new System.IO.FileStream(About.Directory + "banner_t" + titleID.ToString("x2"), System.IO.FileMode.Open));
+                    case ImageType.Icon:
+                        if (System.IO.File.Exists(About.Directory + "icon_t" + titleID.ToString("x2")))
+                            return System.Drawing.Image.FromStream(new System.IO.FileStream(About.Directory + "icon_t" + titleID.ToString("x2"), System.IO.FileMode.Open));
+                        wc.DownloadData("http://image.xboxlive.com/global/t." + titleID.ToString("x8") + "/icon/0/8000").MakeFile(About.Directory + "icon_t" + titleID.ToString("x2"), false);
+                        return System.Drawing.Image.FromStream(new System.IO.FileStream(About.Directory + "icon_t" + titleID.ToString("x2"), System.IO.FileMode.Open));
+                    case ImageType.LargeBoxArt:
+                        if (System.IO.File.Exists(About.Directory + "large_t" + titleID.ToString("x2")))
+                            return System.Drawing.Image.FromStream(new System.IO.FileStream(About.Directory + "large_t" + titleID.ToString("x2"), System.IO.FileMode.Open));
+                        wc.DownloadData("http://tiles.xbox.com/consoleAssets/" + titleID.ToString("x8") + "/en-GB/largeboxart.jpg").MakeFile(About.Directory + "large_t" + titleID.ToString("x2"), false);
+                        return System.Drawing.Image.FromStream(new System.IO.FileStream(About.Directory + "large_t" + titleID.ToString("x2"), System.IO.FileMode.Open));
+                    case ImageType.MarketPlace:
+                        if (System.IO.File.Exists(About.Directory + "market_t" + titleID.ToString("x2")))
+                            return System.Drawing.Image.FromStream(new System.IO.FileStream(About.Directory + "market_t" + titleID.ToString("x2"), System.IO.FileMode.Open));
+                        wc.DownloadData("http://marketplace.xbox.com/en-US/Title/" + titleID).MakeFile(About.Directory + "market_t" + titleID.ToString("x2"), false);
+                        return System.Drawing.Image.FromStream(new System.IO.FileStream(About.Directory + "market_t" + titleID.ToString("x2"), System.IO.FileMode.Open));
+                    case ImageType.SmallBoxArt:
+                        if (System.IO.File.Exists(About.Directory + "small_t" + titleID.ToString("x2")))
+                            return System.Drawing.Image.FromStream(new System.IO.FileStream(About.Directory + "small_t" + titleID.ToString("x2"), System.IO.FileMode.Open));
+                        wc.DownloadData("http://tiles.xbox.com/consoleAssets/" + titleID.ToString("x8") + "/en-GB/smallboxart.jpg").MakeFile(About.Directory + "small_t" + titleID.ToString("x2"), false);
+                        return System.Drawing.Image.FromStream(new System.IO.FileStream(About.Directory + "small_t" + titleID.ToString("x2"), System.IO.FileMode.Open));
+                    default: throw new IndexOutOfRangeException();
+                }
+            }
+        }
 
         public uint TitleID { get { return titleID; } }
         public int Achievements { get { return gscore[0]; } set { gscore[0] = value; } }
@@ -73,67 +122,39 @@ namespace Xbox360Content.XDBF.GPD
             set { playtime = value.ToFileTime(); }
         }
 
-        public Title(ref IO io)
+        public Title(Entry e, ref IO io)
         {
+            this.Entry = e;
             bigEndian = io.Endianness == Endian.Big;
             titleID = io.ReadUInt32();
             gscore = new int[4];
             for (int i = 0; i < 4; i++)
                 gscore[i] = io.ReadInt32();
             avatar = io.ReadBytes(8);
-            flags = io.ReadUInt32();
+            flags = io.ReadBytes(4);
             playtime = io.ReadInt64();
             name = io.ReadZString(true);
         }
+        string name;
+        public string Name { get { return name; }
+            set
+            {
+                this.Entry.length -= (uint)((name.Length + 1) * 2);
+                this.Entry.length += (uint)((value.Length + 1) * 2);
+                name = value;
+            } 
+        }
 
-        public static explicit operator byte[](Setting s)
+        public static explicit operator byte[](Title t)
         {
-            List<byte> bytes = new List<byte>(s.SettingID.ToBytes(s.bigEndian));
-            bytes.AddRange(s.lastEdited.ToBytes(s.bigEndian));
-            bytes.AddRange(s.Unknown.ToBytes(s.bigEndian));
-            bytes.Add(s.dataType);
-            bytes.AddRange(s.nulls);
-            if (s.optional != null)
-            {
-                bytes.AddRange(s.optional.GetValueOrDefault().ToBytes(s.bigEndian));
-                bytes.AddRange(0.ToBytes(false));
-                if (s.DataType == SettingTypes.UnicodeString)
-                    bytes.AddRange(((string)s.val).ToBytes(true));
-                else
-                    bytes.AddRange((byte[])s.val);
-            }
-            switch (s.dataType)
-            {
-                case 0:
-                case 0xFF:
-                    break;
-                case 1:
-                    bytes.AddRange(((int)s.val).ToBytes(s.bigEndian));
-                    break;
-                case 2:
-                    bytes.AddRange(((long)s.val).ToBytes(s.bigEndian));
-                    break;
-                case 3:
-                    bytes.AddRange(((double)s.val).ToBytes(s.bigEndian));
-                    break;
-                case 4:
-                    bytes.AddRange(s.optional.GetValueOrDefault().ToBytes(s.bigEndian));
-                    bytes.AddRange(0.ToBytes(false));
-                    bytes.AddRange(((string)s.val).ToBytes(true));
-                    break;
-                case 5:
-                    bytes.AddRange(((float)s.val).ToBytes(s.bigEndian));
-                    break;
-                case 6:
-                    bytes.AddRange(s.optional.GetValueOrDefault().ToBytes(s.bigEndian));
-                    bytes.AddRange(0.ToBytes(false));
-                    bytes.AddRange((byte[])s.val);
-                    break;
-                case 7:
-                    bytes.AddRange(((DateTime)s.val).ToFileTime().ToBytes(s.bigEndian));
-                    break;
-                default: throw new XDBFException("Could not determine data Type in setting");
-            }
+            List<byte> bytes = new List<byte>(t.TitleID.ToBytes(t.bigEndian));
+            for (int i = 0; i < t.gscore.Length; i++)
+                bytes.AddRange(t.gscore[i].ToBytes(t.bigEndian));
+            bytes.AddRange(t.avatar);
+            bytes.AddRange(t.flags);
+            bytes.AddRange(t.playtime.ToBytes(t.bigEndian));
+            bytes.AddRange(t.Name.ToBytes(true, t.bigEndian));
+            bytes.AddRange(new byte[2] { 0, 0 });
             return bytes.ToArray();
         }
     }

@@ -25,33 +25,24 @@ namespace Xbox360Content.XDBF
     /// <summary>
     /// Structure for the Entry table in XBDF file
     /// </summary>
-    public class Entry
+    public class FreeEntry
     {
         bool bigEndian;
         internal uint length, specifier;
-        internal ushort _nameID;
-        internal ulong id;
 
         public uint Offset { get { return specifier; } }
         public uint Length { get { return length; } }
-
-        public Entry(bool bigndian) { bigEndian = bigndian; }
-        public Entry(bool bigndian, uint l, uint spec, ushort name, ulong i) { bigEndian = bigndian; length = l; specifier = spec; _nameID = name; id = i; }
-        public Entry(ref IO io)
+        
+        public FreeEntry(ref IO io)
         {
             bigEndian = io.Endianness == Endian.Big;
-            _nameID = io.ReadUInt16();
-            id = io.ReadUInt64();
             specifier = io.ReadUInt32();
             length = io.ReadUInt32();
         }
-
-        public static explicit operator byte[](Entry e)
+        public static explicit operator byte[](FreeEntry fe)
         {
-            List<byte> bytes = new List<byte>(e._nameID.ToBytes(e.bigEndian));
-            bytes.AddRange(e.id.ToBytes(e.bigEndian));
-            bytes.AddRange(e.specifier.ToBytes(e.bigEndian));
-            bytes.AddRange(e.length.ToBytes(e.bigEndian));
+            List<byte> bytes = new List<byte>(fe.specifier.ToBytes(fe.bigEndian));
+            bytes.AddRange(fe.length.ToBytes(fe.bigEndian));
             return bytes.ToArray();
         }
     }

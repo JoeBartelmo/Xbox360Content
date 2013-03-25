@@ -1,25 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xbox360Content;
+using System.Windows.Forms;
 
 namespace Testing
 {
-    class Program
+    static class Program
     {
-        static void Main(string[] args)
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
         {
-            //IO test
-            using (IO io = new IO(@"C:\Users\Joe\Desktop\asdf", Endian.Big))
-            {
-                Console.WriteLine(io.ReadInt32().ToString("X2"));
-                Console.WriteLine(io.ReadInt32().ToString("X2"));
-                Console.WriteLine(io.ReadInt64().ToString("X2"));
-                Console.WriteLine(io.Position.ToString("X2"));
-                Console.WriteLine(io.ReadZString(Endian.Big));
-            }
-            Console.ReadLine();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
         }
     }
 }

@@ -40,6 +40,18 @@ namespace Xbox360Content.XDBF.GPD
     /// </summary>
     public struct Achievement
     {
+        public System.Drawing.Image Image(GPD gpd)
+        {
+            Xbox360Content.XDBF.Entry e = gpd.SearchByID(this.ImageID);
+            foreach (Image i in gpd.Images.ToArray())
+            {
+                if (i.Entry.id == e.id)
+                    return i.Png;
+            }
+            return null;
+        }
+
+        public Entry Entry;
         private bool endian;
         private uint[] data;
         private int score;
@@ -54,8 +66,8 @@ namespace Xbox360Content.XDBF.GPD
         private uint Flags { get { return data[3]; } set{data[3] = value;} }
 
         public string Name { get { return sdata[0]; } }
-        public string UnlockedDescription { get { return sdata[1]; } set { sdata[1] = value; } }
-        public string LockedDescription { get { return sdata[2]; } set { sdata[2] = value; } }
+        public string UnlockedDescription { get { return sdata[1]; } }
+        public string LockedDescription { get { return sdata[2]; } }
 
         public AchievementTypes AchievementType
         {
@@ -129,8 +141,9 @@ namespace Xbox360Content.XDBF.GPD
             }
         }
 
-        public Achievement(ref IO io)
+        public Achievement(Entry e, ref IO io)
         {
+            this.Entry = e;
             endian = io.Endianness == Endian.Big;
             data = new uint[4];
             sdata = new string[3];
@@ -141,6 +154,7 @@ namespace Xbox360Content.XDBF.GPD
             unlock = io.ReadInt64();
             for (int i = 0; i < sdata.Length; i++)
                 sdata[i] = io.ReadZString(true);
+            Console.WriteLine("{0:X2} -> {1:x2}", e.length, (uint)((byte[])this).LongLength);
         }
 
         public static explicit operator byte[](Achievement cheevo)
@@ -150,11 +164,12 @@ namespace Xbox360Content.XDBF.GPD
             cheev.AddRange(cheevo.data[2].ToBytes(cheevo.endian));
             cheev.AddRange(cheevo.score.ToBytes(cheevo.endian));
             cheev.AddRange(cheevo.data[3].ToBytes(cheevo.endian));
-            cheev.AddRange(cheevo.sdata[0].ToBytes(cheevo.endian));
+            cheev.AddRange(cheevo.unlock.ToBytes(cheevo.endian));
+            cheev.AddRange(cheevo.sdata[0].ToBytes(true, cheevo.endian));
             cheev.AddRange(new byte[2] { 0, 0 });
-            cheev.AddRange(cheevo.sdata[1].ToBytes(cheevo.endian));
+            cheev.AddRange(cheevo.sdata[1].ToBytes(true, cheevo.endian));
             cheev.AddRange(new byte[2] { 0, 0 });
-            cheev.AddRange(cheevo.sdata[2].ToBytes(cheevo.endian));
+            cheev.AddRange(cheevo.sdata[2].ToBytes(true, cheevo.endian));
             cheev.AddRange(new byte[2] { 0, 0 });
             return cheev.ToArray();
         }

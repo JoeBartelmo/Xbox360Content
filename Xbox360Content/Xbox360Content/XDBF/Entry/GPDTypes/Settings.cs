@@ -42,7 +42,9 @@ namespace Xbox360Content.XDBF.GPD
     /// </summary>
     public struct Setting
     {
+        public Entry Entry;
         private bool bigEndian;
+
         internal int SettingID;
         private ushort lastEdited;
         private short Unknown;
@@ -87,7 +89,6 @@ namespace Xbox360Content.XDBF.GPD
                 switch (dataType)
                 {
                     case 0:
-                        return null;
                     case 1:
                         return typeof(int);
                     case 2:
@@ -109,7 +110,6 @@ namespace Xbox360Content.XDBF.GPD
             }
         }
 
-        int? optional;
         object val;
         public object Data
         {
@@ -121,9 +121,16 @@ namespace Xbox360Content.XDBF.GPD
                 else if (value.GetType() == DataInterop)
                 {
                     if (DataInterop == typeof(string))
-                        optional = ((string)value).Length;
+                    {
+                        this.Entry.length -= (uint)((((string)val).Length * 2));
+                        this.Entry.length += (uint)((((string)value).Length * 2));
+
+                    }
                     if (DataInterop == typeof(byte[]))
-                        optional = ((byte[])value).Length;
+                    {
+                        this.Entry.length -= (uint)(((byte[])value).Length);
+                        this.Entry.length += (uint)(((byte[])value).Length);
+                    }
                     val = value;
                 }
                 else
@@ -131,23 +138,25 @@ namespace Xbox360Content.XDBF.GPD
             }
         }
 
-        public Setting(ref IO io)
+        public Setting(Entry e, ref IO io)
         {
-            optional = null;
+            this.Entry = e;
             bigEndian = io.Endianness == Endian.Big;
+            
+
             SettingID = io.ReadInt32();
             lastEdited = io.ReadUInt16();
             Unknown = io.ReadInt16();
             dataType = io.ReadByte();
             nulls = io.ReadBytes(7);
+
             switch(dataType)
             {
                 case 0:
-                    val = null;
-                    break;
                 case 1:
                     val = io.ReadInt32();
                     break;
+                case 7:
                 case 2:
                     val = io.ReadInt64();
                     break;
@@ -155,26 +164,30 @@ namespace Xbox360Content.XDBF.GPD
                     val = io.ReadDouble();
                     break;
                 case 4:
-                    optional = io.ReadInt32();
-                    io.ReadInt32();
-                    val = io.ReadString(optional.GetValueOrDefault(), true);
+                    int x = io.ReadInt24();
+                    io.ReadBytes(5);
+                    val = io.ReadBytes(x).GetString(true);
+                    //Console.WriteLine(x.ToBytes(true).ToHex());
                     break;
                 case 5:
                     val = io.ReadFloat();
                     break;
                 case 6:
-                    optional = io.ReadInt32();
-                    io.ReadInt32();
-                    val = io.ReadBytes(optional.GetValueOrDefault());
-                    break;
-                case 7:
-                    val = DateTime.FromFileTime(io.ReadInt64());
+                    int y = io.ReadInt24();
+                    io.ReadBytes(5);
+                    val = io.ReadBytes(y);
+                    //Console.WriteLine(y);
                     break;
                 case 255:
                     val = null;
                     break;
-                default: throw new XDBFException("Could not determine data Type in setting");
+                default:
+                    Console.WriteLine("Er: 0x{0:X2}", io.Position - 16);
+                    throw new XDBFException("Could not determine data Type in setting");
             }
+            //Console.WriteLine("{2} ~> {1:X2} -> {0:X2}", ((byte[])this).Length, e.length, this.DataType);
+            //testing
+            //((byte[])this).MakeFile("namespaces\\" + e._nameID.ToString("x2"), true);
         }
 
         public static explicit operator byte[](Setting s)
@@ -184,23 +197,17 @@ namespace Xbox360Content.XDBF.GPD
             bytes.AddRange(s.Unknown.ToBytes(s.bigEndian));
             bytes.Add(s.dataType);
             bytes.AddRange(s.nulls);
-            if (s.optional != null)
-            {
-                bytes.AddRange(s.optional.GetValueOrDefault().ToBytes(s.bigEndian));
-                bytes.AddRange(0.ToBytes(false));
-                if (s.DataType == SettingTypes.UnicodeString)
-                    bytes.AddRange(((string)s.val).ToBytes(true));
-                else
-                    bytes.AddRange((byte[])s.val);
-            }
+            byte[] b = new byte[4];
             switch (s.dataType)
             {
-                case 0:
                 case 0xFF:
                     break;
+                case 0:
                 case 1:
                     bytes.AddRange(((int)s.val).ToBytes(s.bigEndian));
+                    bytes.AddRange(b);
                     break;
+                case 7:
                 case 2:
                     bytes.AddRange(((long)s.val).ToBytes(s.bigEndian));
                     break;
@@ -208,20 +215,18 @@ namespace Xbox360Content.XDBF.GPD
                     bytes.AddRange(((double)s.val).ToBytes(s.bigEndian));
                     break;
                 case 4:
-                    bytes.AddRange(s.optional.GetValueOrDefault().ToBytes(s.bigEndian));
-                    bytes.AddRange(0.ToBytes(false));
-                    bytes.AddRange(((string)s.val).ToBytes(true));
+                    bytes.AddRange((((((string)s.val).Length) * 2)).ToBytes(s.bigEndian));
+                    bytes.AddRange(b);
+                    bytes.AddRange(((string)s.val).ToBytes(true, s.bigEndian));
                     break;
                 case 5:
                     bytes.AddRange(((float)s.val).ToBytes(s.bigEndian));
+                    bytes.AddRange(b);
                     break;
                 case 6:
-                    bytes.AddRange(s.optional.GetValueOrDefault().ToBytes(s.bigEndian));
-                    bytes.AddRange(0.ToBytes(false));
+                    bytes.AddRange((((byte[])s.val).Length).ToBytes(s.bigEndian));
+                    bytes.AddRange(b);
                     bytes.AddRange((byte[])s.val);
-                    break;
-                case 7:
-                    bytes.AddRange(((DateTime)s.val).ToFileTime().ToBytes(s.bigEndian));
                     break;
                 default: throw new XDBFException("Could not determine data Type in setting");
             }

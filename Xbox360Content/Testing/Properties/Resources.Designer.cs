@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Testing {
+namespace Testing.Properties {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Testing {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Files {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Files() {
+        internal Resources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Testing {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Testing.Files", typeof(Files).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Testing.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,27 +57,6 @@ namespace Testing {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        internal static byte[] a {
-            get {
-                object obj = ResourceManager.GetObject("a", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        internal static byte[] b {
-            get {
-                object obj = ResourceManager.GetObject("b", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        internal static byte[] c {
-            get {
-                object obj = ResourceManager.GetObject("c", resourceCulture);
-                return ((byte[])(obj));
             }
         }
     }

@@ -23,10 +23,48 @@ namespace Xbox360Content.XDBF.GPD
 {
     public struct Image
     {
-        public static System.Drawing.Image LoadImage(int offset, int length, ref Xbox360Content.IO io)
+        public Entry Entry;
+        System.IO.MemoryStream ms;
+        public System.Drawing.Image Png
         {
-            io.Position = offset;
-            return System.Drawing.Image.FromStream(new System.IO.MemoryStream(io.ReadBytes(length)));
+            get
+            {
+                return System.Drawing.Image.FromStream(ms);
+            }
+            set
+            {
+                value.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                Entry.length = (uint)ms.Length;
+            }
+        }
+
+        public static explicit operator byte[](Image i)
+        {
+            return i.ms.ToArray();
+        }
+
+        public Image(Entry e, ref IO io)
+        {
+            this.Entry = e;
+            if (e.length > int.MaxValue)
+                throw new IndexOutOfRangeException();
+            this.ms = new System.IO.MemoryStream(io.ReadBytes((int)Entry.length));
+            Entry.length = (uint)ms.Length;
+
+            //testing
+            //Png.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.Millisecond +".png");
+            //System.Threading.Thread.Sleep(5000);
+        }
+        public static System.Drawing.Image LoadImage(long offset, long length, ref Xbox360Content.IO io)
+        {
+            try
+            {
+                io.Position = offset;
+                if (length > int.MaxValue)
+                    throw new IndexOutOfRangeException();
+                return System.Drawing.Image.FromStream(new System.IO.MemoryStream(io.ReadBytes((int)length)));
+            }
+            catch (Exception ex) { Log.Write(string.Format("Problem loading Image @ 0x{0:x2",io.Position - length), 2); throw ex; }
         }
     }
 }

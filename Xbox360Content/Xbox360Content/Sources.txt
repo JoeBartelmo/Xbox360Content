@@ -11,3 +11,8 @@ http://www.hackersdelight.org/crc.pdf
 STFS (prior knowledge used as well):
 http://free60.org/STFS
 http://www.arkem.org/xbox360-file-reference.pdf <-- essentially free60.org with wider explanations
+
+XDBF (prior knowledge used as well):
+http://free60.org/XDBF
+http://free60.org/GPD
+http://free60.org/PEC

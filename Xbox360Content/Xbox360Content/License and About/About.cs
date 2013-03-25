@@ -23,6 +23,11 @@ namespace Xbox360Content
 {
     public static class About
     {
+        public static string Directory
+        {
+            get { return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\Xbox360Content\\"; }
+        }
+
         public static readonly string Disclaimer = @"Copyright (C) 2013 Joseph Bartelmo
 
     This program is free software: you can redistribute it and/or modify

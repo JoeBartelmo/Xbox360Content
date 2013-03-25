@@ -44,11 +44,10 @@ namespace Xbox360Content
     public class IO : IDisposable
     {
         //Declare Variables
+        private string name;
         private Stream _stream;
         private BinaryReader _in;
         private BinaryWriter _out;
-        private ASCIIEncoding _ascii;
-        private UnicodeEncoding _unicode;
         private byte[] temp;
 
         //Public Variables
@@ -67,6 +66,35 @@ namespace Xbox360Content
         /// Displays the position of the stream
         /// </summary>
         public long Position { get { return _in.BaseStream.Position; } set { Seek(value); } }
+        /// <summary>
+        /// Replaces the underlying stream with a new set of bytes
+        /// </summary>
+        /// <param name="bytes"></param>
+        public void ReplaceStream(byte[] bytes)
+        {
+            long currentpos = (Position > bytes.LongLength) ? 0 : Position;
+
+            if (name != null)
+            {
+                _in.Dispose();
+                _out.Dispose();
+                _stream.Dispose();
+                bytes.MakeFile(name, false);
+                _stream = new FileStream(name, FileMode.OpenOrCreate);
+
+            }
+            else
+            {
+                _stream.SetLength(bytes.LongLength);
+                _stream.Write(bytes, 0, bytes.Length);
+                _stream.Flush();
+            }
+
+            _in = new BinaryReader(_stream);
+            _out = new BinaryWriter(_stream);
+            
+            Position = currentpos;
+        }
 
         //.ctor
         private void _base(Stream stream)
@@ -76,8 +104,6 @@ namespace Xbox360Content
                 _stream = stream;
                 _in = new BinaryReader(_stream);
                 _out = new BinaryWriter(_stream);
-                _ascii = new ASCIIEncoding();
-                _unicode = new UnicodeEncoding();
             }
             else
                 throw new ArgumentNullException();
@@ -112,10 +138,7 @@ namespace Xbox360Content
         public IO(byte[] bytes)
         {
             if (bytes != null)
-            {
-                using (MemoryStream ms = new MemoryStream(bytes))
-                    _base(ms);
-            }
+                _base(new MemoryStream(bytes));
             else
                 throw new ArgumentNullException();
         }
@@ -130,8 +153,7 @@ namespace Xbox360Content
             if (bytes != null)
             {
                 Endianness = endian;
-                using (MemoryStream ms = new MemoryStream(bytes))
-                    _base(ms);
+                _base(new MemoryStream(bytes));
             }
             else
                 throw new ArgumentNullException();
@@ -143,11 +165,9 @@ namespace Xbox360Content
         /// <param name="file">Location of a file on a system</param>
         public IO(string file)
         {
+            name = file;
             if (File.Exists(file))
-            {
-                using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite))
-                    _base(fs);
-            }
+                _base(new FileStream(file, FileMode.Open, FileAccess.ReadWrite));
             else
                 throw new FileNotFoundException();
         }
@@ -162,8 +182,7 @@ namespace Xbox360Content
             if (File.Exists(file))
             {
                 Endianness = endian;
-                using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite))
-                    _base(fs);
+                _base(new FileStream(file, FileMode.Open, FileAccess.ReadWrite));
             }
             else
                 throw new FileNotFoundException();
@@ -393,7 +412,7 @@ namespace Xbox360Content
         /// <returns>Decimal</returns>
         public double ReadDouble(Endian endian)
         {
-            ReadBytes(0x4, endian);
+            ReadBytes(0x8, endian);
             return BitConverter.ToDouble(temp, 0);
         }
         /// <summary>
@@ -402,7 +421,7 @@ namespace Xbox360Content
         /// <returns>Decimal</returns>
         public double ReadDouble()
         {
-            ReadBytes(0x4, Endianness);
+            ReadBytes(0x8, Endianness);
             return BitConverter.ToDouble(temp, 0);
         }
         /// <summary>
@@ -431,7 +450,7 @@ namespace Xbox360Content
         {
             if (unicode) ReadBytes((count * 2), endian);
             else ReadBytes(count, endian);
-            return unicode ? _unicode.GetString(temp) : _ascii.GetString(temp);
+            return temp.GetString(unicode);
         }
         /// <summary>
         /// Read String Value
@@ -486,7 +505,7 @@ namespace Xbox360Content
                         break;
                     else bytes.Add(i);
                 }
-                return _ascii.GetString(bytes.ToArray());
+                return bytes.ToArray().GetString(unicode);
             }
             else
             {
@@ -791,7 +810,7 @@ namespace Xbox360Content
         /// </summary>
         public void Write(string s, bool unicode, Endian endian)
         {
-            temp = unicode ? _unicode.GetBytes(s) : _ascii.GetBytes(s);
+            temp = s.ToBytes(unicode, endian == Endian.Big);
             this.Write(temp, endian);
         }
         /// <summary>
@@ -804,20 +823,18 @@ namespace Xbox360Content
         /// <summary>
         /// Writes a zero-teriminating string
         /// </summary>
-        public void WriteZString(string s, Endian endian)
+        public void WriteZString(string s, bool unicode, Endian endian)
         {
-            List<byte> bytes = new List<byte>(_ascii.GetBytes(s));
-            bytes.Add(0x00);
-            this.Write(bytes.ToArray(), endian);
-            bytes = null;
+            this.Write(s, unicode, endian);
+            this.Write((ushort)0);
         }
         /// <summary>
         /// Writes a zero-terminating string
         /// </summary>
         /// <param name="s"></param>
-        public void WriteZString(string s)
+        public void WriteZString(string s, bool unicode)
         {
-            this.WriteZString(s, this.type);
+            this.WriteZString(s, unicode, this.type);
         }
         /// <summary>
         /// Writes an int 24
@@ -865,8 +882,6 @@ namespace Xbox360Content
                 _out.Dispose();
                 _stream.Dispose();
             }
-            _ascii = null;
-            _unicode = null;
             temp = null;
             GC.Collect();
             GC.WaitForPendingFinalizers();

@@ -23,7 +23,7 @@ namespace Xbox360Content
 {
     public static class Log
     {
-        static string temp;
+        static string temp, total;
         public static bool EnableLogging = false, ConsoleLogging = false;
         //Entry Structure: [Type] Message
         /// <summary>
@@ -39,14 +39,16 @@ namespace Xbox360Content
             {
                 switch (type)
                 {
-                    case 1: temp = string.Format("{0}[WARNING]: {1}", temp, message);
+                    case 1: temp = string.Format("[WARNING]: {0}", message);
                         break;
-                    case 2: temp = string.Format("{0}[-ERROR-]: {1}", temp, message);
+                    case 2: temp = string.Format("[-ERROR-]: {0}", message);
                         break;
-                    default: temp = string.Format("{0}[MESSAGE]: {1}", temp, message);
+                    default: temp = string.Format("[MESSAGE]: {0}", message);
                         break;
                 }
-                if (ConsoleLogging) Console.WriteLine(temp);
+                total += "\n" + temp;
+                if (ConsoleLogging) 
+                    Console.WriteLine(temp);
             }
         }
 
