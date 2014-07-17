@@ -48,7 +48,7 @@ namespace Xbox360Content
         private Stream _stream;
         private BinaryReader _in;
         private BinaryWriter _out;
-        private byte[] temp;
+        private byte[] buffer;
 
         //Public Variables
         private Endian type = Endian.Little;
@@ -207,11 +207,11 @@ namespace Xbox360Content
         /// <returns>unsigned byte array</returns>
         public byte[] ReadBytes(int count, Endian endian)
         {
-            temp = _in.ReadBytes(count);
+            buffer = _in.ReadBytes(count);
             if (endian == Endian.Big)
-                Array.Reverse(temp);
+                Array.Reverse(buffer);
             Seek(_in.BaseStream.Position);
-            return temp;
+            return buffer;
         }
         /// <summary>
         /// Reads a byte array
@@ -258,7 +258,7 @@ namespace Xbox360Content
         public short ReadInt16(Endian endian)
         {
             ReadBytes(0x2, endian);
-            return BitConverter.ToInt16(temp, 0);
+            return BitConverter.ToInt16(buffer, 0);
         }
         /// <summary>
         /// Reads a 16 bit integer
@@ -267,7 +267,7 @@ namespace Xbox360Content
         public short ReadInt16()
         {
             ReadBytes(0x2, Endianness);
-            return BitConverter.ToInt16(temp, 0);
+            return BitConverter.ToInt16(buffer, 0);
         }
         /// <summary>
         /// Reads an unsigned 16 bit integer
@@ -277,7 +277,7 @@ namespace Xbox360Content
         public ushort ReadUInt16(Endian endian)
         {
             ReadBytes(0x2, endian);
-            return BitConverter.ToUInt16(temp, 0);
+            return BitConverter.ToUInt16(buffer, 0);
         }
         /// <summary>
         /// Reads an unsigned 16 bit integer
@@ -286,29 +286,28 @@ namespace Xbox360Content
         public ushort ReadUInt16()
         {
             ReadBytes(0x2, Endianness);
-            return BitConverter.ToUInt16(temp, 0);
+            return BitConverter.ToUInt16(buffer, 0);
         }
         /// <summary>
         /// Reads an signed 24 bit integer
         /// </summary>
         /// <param name="endian"></param>
         /// <returns>signed int24</returns>
-        public int ReadInt24(Endian endian)
+        public Values.int24 ReadInt24(Endian endian)
         {
-            List<byte> bytes = new List<byte>(ReadBytes(3, endian));
-            bytes.Add(0);
-            return BitConverter.ToInt32(bytes.ToArray(), 0);
+            ReadBytes(3, endian);
+            return (Values.int24)BitConverter.ToInt32(new byte[4] { buffer[0], buffer[1], buffer[2], 0 }, 0);
         }
         /// <summary>
         /// Reads an signed 24 bit integer
         /// </summary>
         /// <param name="endian"></param>
         /// <returns>signed int24</returns>
-        public int ReadInt24()
+        public Values.int24 ReadInt24()
         {
             List<byte> bytes = new List<byte>(ReadBytes(3, Endianness));
             bytes.Add(0);
-            return BitConverter.ToInt32(bytes.ToArray(), 0);
+            return (Values.int24)BitConverter.ToInt32(bytes.ToArray(), 0);
         }
         /// <summary>
         /// Reads a 32 bit integer
@@ -318,7 +317,7 @@ namespace Xbox360Content
         public int ReadInt32(Endian endian)
         {
             ReadBytes(0x4, endian);
-            return BitConverter.ToInt32(temp, 0);
+            return BitConverter.ToInt32(buffer, 0);
         }
         /// <summary>
         /// Reads an signed 32 bit integer
@@ -327,7 +326,7 @@ namespace Xbox360Content
         public int ReadInt32()
         {
             ReadBytes(0x4, Endianness);
-            return BitConverter.ToInt32(temp, 0);
+            return BitConverter.ToInt32(buffer, 0);
         }
         /// <summary>
         /// Reads an unsigned 32 bit integer
@@ -337,7 +336,7 @@ namespace Xbox360Content
         public uint ReadUInt32(Endian endian)
         {
             ReadBytes(0x4, endian);
-            return BitConverter.ToUInt32(temp, 0);
+            return BitConverter.ToUInt32(buffer, 0);
         }
         /// <summary>
         /// Reads an unsigned 32 bit integer
@@ -346,7 +345,7 @@ namespace Xbox360Content
         public uint ReadUInt32()
         {
             ReadBytes(0x4, Endianness);
-            return BitConverter.ToUInt32(temp, 0);
+            return BitConverter.ToUInt32(buffer, 0);
         }
         /// <summary>
         /// Reads a 64 bit integer
@@ -356,7 +355,7 @@ namespace Xbox360Content
         public long ReadInt64(Endian endian)
         {
             ReadBytes(0x8, endian);
-            return BitConverter.ToInt64(temp, 0);
+            return BitConverter.ToInt64(buffer, 0);
         }
         /// <summary>
         /// Reads a 64 bit integer
@@ -365,7 +364,7 @@ namespace Xbox360Content
         public long ReadInt64()
         {
             ReadBytes(0x8, Endianness);
-            return BitConverter.ToInt64(temp, 0);
+            return BitConverter.ToInt64(buffer, 0);
         }
         /// <summary>
         /// Reads an unsigned 64 bit integer
@@ -375,7 +374,7 @@ namespace Xbox360Content
         public ulong ReadUInt64(Endian endian)
         {
             ReadBytes(0x8, endian);
-            return BitConverter.ToUInt64(temp, 0);
+            return BitConverter.ToUInt64(buffer, 0);
         }
         /// <summary>
         /// Reads an unsigned 64 bit integer
@@ -384,7 +383,7 @@ namespace Xbox360Content
         public ulong ReadUInt64()
         {
             ReadBytes(0x8, Endianness);
-            return BitConverter.ToUInt64(temp, 0);
+            return BitConverter.ToUInt64(buffer, 0);
         }
         /// <summary>
         /// Read Float value
@@ -394,7 +393,7 @@ namespace Xbox360Content
         public float ReadFloat(Endian endian)
         {
             ReadBytes(0x4, endian);
-            return BitConverter.ToSingle(temp, 0);
+            return BitConverter.ToSingle(buffer, 0);
         }
         /// <summary>
         /// Read Float value
@@ -403,7 +402,7 @@ namespace Xbox360Content
         public float ReadFloat()
         {
             ReadBytes(0x4, Endianness);
-            return BitConverter.ToSingle(temp, 0);
+            return BitConverter.ToSingle(buffer, 0);
         }
         /// <summary>
         /// Read Decimal value
@@ -413,7 +412,7 @@ namespace Xbox360Content
         public double ReadDouble(Endian endian)
         {
             ReadBytes(0x8, endian);
-            return BitConverter.ToDouble(temp, 0);
+            return BitConverter.ToDouble(buffer, 0);
         }
         /// <summary>
         /// Read Decimal value
@@ -422,7 +421,7 @@ namespace Xbox360Content
         public double ReadDouble()
         {
             ReadBytes(0x8, Endianness);
-            return BitConverter.ToDouble(temp, 0);
+            return BitConverter.ToDouble(buffer, 0);
         }
         /// <summary>
         ///Read Char value
@@ -450,7 +449,7 @@ namespace Xbox360Content
         {
             if (unicode) ReadBytes((count * 2), endian);
             else ReadBytes(count, endian);
-            return temp.GetString(unicode);
+            return buffer.GetString(unicode);
         }
         /// <summary>
         /// Read String Value
@@ -675,8 +674,8 @@ namespace Xbox360Content
         /// </summary>
         public void Write(short i, Endian endian)
         {
-            temp = BitConverter.GetBytes(i);
-            this.Write(temp, endian);
+            buffer = BitConverter.GetBytes(i);
+            this.Write(buffer, endian);
         }
         /// <summary>
         /// Writes a signed 16 bit integer
@@ -690,8 +689,8 @@ namespace Xbox360Content
         /// </summary>
         public void Write(ushort i, Endian endian)
         {
-            temp = BitConverter.GetBytes(i);
-            this.Write(temp, endian);
+            buffer = BitConverter.GetBytes(i);
+            this.Write(buffer, endian);
         }
         /// <summary>
         /// Writes a unsigned 16 bit integer
@@ -705,8 +704,8 @@ namespace Xbox360Content
         /// </summary>
         public void Write(int i, Endian endian)
         {
-            temp = BitConverter.GetBytes(i);
-            this.Write(temp, endian);
+            buffer = BitConverter.GetBytes(i);
+            this.Write(buffer, endian);
         }
         /// <summary>
         /// Writes a signed 32 bit integer
@@ -720,8 +719,8 @@ namespace Xbox360Content
         /// </summary>
         public void Write(uint i, Endian endian)
         {
-            temp = BitConverter.GetBytes(i);
-            this.Write(temp, endian);
+            buffer = BitConverter.GetBytes(i);
+            this.Write(buffer, endian);
         }
         /// <summary>
         /// Writes a unsigned 32 bit integer
@@ -735,8 +734,8 @@ namespace Xbox360Content
         /// </summary>
         public void Write(long i, Endian endian)
         {
-            temp = BitConverter.GetBytes(i);
-            this.Write(temp, endian);
+            buffer = BitConverter.GetBytes(i);
+            this.Write(buffer, endian);
         }
         /// <summary>
         /// Writes a signed 64 bit integer
@@ -750,8 +749,8 @@ namespace Xbox360Content
         /// </summary>
         public void Write(ulong i, Endian endian)
         {
-            temp = BitConverter.GetBytes(i);
-            this.Write(temp, endian);
+            buffer = BitConverter.GetBytes(i);
+            this.Write(buffer, endian);
         }
         /// <summary>
         /// Writes a unsigned 64 bit integer
@@ -765,8 +764,8 @@ namespace Xbox360Content
         /// </summary>
         public void Write(double i, Endian endian)
         {
-            temp = BitConverter.GetBytes(i);
-            this.Write(temp, endian);
+            buffer = BitConverter.GetBytes(i);
+            this.Write(buffer, endian);
         }
         /// <summary>
         /// Writes decimal value
@@ -780,8 +779,8 @@ namespace Xbox360Content
         /// </summary>
         public void Write(float i, Endian endian)
         {
-            temp = BitConverter.GetBytes(i);
-            this.Write(temp, endian);
+            buffer = BitConverter.GetBytes(i);
+            this.Write(buffer, endian);
         }
         /// <summary>
         /// Writes float value
@@ -795,8 +794,8 @@ namespace Xbox360Content
         /// </summary>
         public void Write(char i, Endian endian)
         {
-            temp = BitConverter.GetBytes(i);
-            this.Write(temp, endian);
+            buffer = BitConverter.GetBytes(i);
+            this.Write(buffer, endian);
         }
         /// <summary>
         /// Writes char value
@@ -810,8 +809,8 @@ namespace Xbox360Content
         /// </summary>
         public void Write(string s, bool unicode, Endian endian)
         {
-            temp = s.ToBytes(unicode, endian == Endian.Big);
-            this.Write(temp, endian);
+            buffer = s.ToBytes(unicode, endian == Endian.Big);
+            this.Write(buffer, endian);
         }
         /// <summary>
         /// Writes a string to the stream
@@ -839,34 +838,25 @@ namespace Xbox360Content
         /// <summary>
         /// Writes an int 24
         /// </summary>
-        public void WriteInt24(int i, Endian endian)
+        public void Write(Values.int24 i , Endian endian)
         {
             if ((i >> 24) > 0)
                 throw new InvalidCastException("Int24 value is too large");
             else
             {
-                List<byte> bytes = new List<byte>(BitConverter.GetBytes(i));
-                bytes.RemoveAt(3);
-                temp = bytes.ToArray();
-                bytes = null;
-                this.Write(temp, endian);
+                buffer = new byte[3];
+                buffer[0] = (byte)(i & 0xff);
+                buffer[1] = (byte)((i >> 8) & 0xff);
+                buffer[2] = (byte)((i >> 16) & 0xff);
+                this.Write(buffer, endian);
             }
         }
         /// <summary>
         /// Writes an int 24
         /// </summary>
-        public void WriteInt24(int i)
+        public void WriteInt24(Values.int24 i)
         {
-            if ((i >> 24) > 0)
-                throw new InvalidCastException("Int24 value is too large");
-            else
-            {
-                List<byte> bytes = new List<byte>(BitConverter.GetBytes(i));
-                bytes.RemoveAt(3);
-                temp = bytes.ToArray();
-                bytes = null;
-                this.Write(temp, this.type);
-            }
+            Write(i, this.Endianness);
         }
 
         //IDisposable
@@ -882,7 +872,7 @@ namespace Xbox360Content
                 _out.Dispose();
                 _stream.Dispose();
             }
-            temp = null;
+            buffer = null;
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }

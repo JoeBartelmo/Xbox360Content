@@ -21,7 +21,7 @@ using System.Text;
 
 namespace Xbox360Content.STFS.Metadata
 {
-    internal class Header
+    public class Information
     {
         License[] li;
         /// <summary>
@@ -42,13 +42,14 @@ namespace Xbox360Content.STFS.Metadata
             }
         }
         internal byte[] hash;
-        uint headerSize;
-        int type, version;
+        uint headerSize, titleID;
+        int type, version, files;
+        long datalength;
 
         /// <summary>
         /// Userfriendly viewing of the type of content
         /// </summary>
-        internal string ContentType
+        public string ContentType
         {
             get
             {
@@ -93,7 +94,18 @@ namespace Xbox360Content.STFS.Metadata
         /// </summary>
         internal bool Version2 { get { return (version == 2); } }
 
-        public Header(ref IO io)
+
+        internal void SetDataFileCount(ref IO io, int length)
+        {
+            io.Seek(0x39d);
+            io.Write(length);
+        }
+        internal void SetDataFileLength(ref IO io, long length)
+        {
+            io.Seek(0x3a1);
+            io.Write(length);
+        }
+        public Information(ref IO io)
         {
             if (io.Position != 0x22c)
                 io.Seek(0x22c);

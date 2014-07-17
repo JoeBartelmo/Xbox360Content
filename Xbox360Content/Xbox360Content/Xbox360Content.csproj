@@ -53,6 +53,8 @@
     <Compile Include="STFS\Enums.cs" />
     <Compile Include="STFS\Metadata\Header.cs" />
     <Compile Include="STFS\Metadata\Version1.cs" />
+    <Compile Include="STFS\Package.cs" />
+    <Compile Include="Values.cs" />
     <Compile Include="XDBF\Entry\FreeEntry.cs" />
     <Compile Include="XDBF\Entry\Entry.cs" />
     <Compile Include="XDBF\Entry\GPDTypes\Achievment.cs" />

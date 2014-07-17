@@ -21,6 +21,7 @@ using System.Reflection;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 /// <summary>
 /// For use inside my DLL
@@ -180,5 +181,46 @@ internal static class Extensions
                 return (new string(chars)).ToBytes(true, false);
             }
         }
+    }
+
+    private static bool match(byte[] heystack, byte[] needle, int offset)
+    {
+        if (offset + needle.Length >= heystack.Length)
+            return false;
+        for (int i = 0; i < needle.Length; i++)
+            if (needle[i] != heystack[i + offset])
+                return false;
+        return true;
+    }
+    static List<int> found = new List<int>();
+    internal static int[] Find(this byte[] bytes, byte[] needle, byte threads = 1)
+    {
+        if (threads == 0)
+            return null;
+        if ((bytes.Length / threads) < needle.Length)
+            throw new Exception("There are too many threads, the given heystack byte array is too small");
+        Task[] tasks = new Task[threads];
+        found.Clear();
+        int splitLength = (bytes.Length / threads) + needle.Length;
+        for (byte i = 1; i <= threads; i++)
+        {
+            if (i == threads)
+                splitLength -= (bytes.Length % 2 == 0) ? needle.Length : (needle.Length - 1);
+            tasks[i - 1] = Task.Factory.StartNew(new Action(() =>
+            {
+                //reinit all variables so we don't have cross threading
+                //access
+                byte[] target = needle,
+                    heystack = bytes;
+                int offset = i * splitLength;
+                //run loop to find the needle
+                for (int j = offset; j < offset + splitLength; j++)
+                    lock (found)
+                        if (match(heystack, target, j) && !found.Contains(j))
+                            found.Add(j);
+            }));
+        }
+        Task.WaitAll(tasks);
+        return found.ToArray();
     }
 }

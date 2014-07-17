@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Xbox360Content.STFS.Metadata
 {
-    internal class Version1 : Header
+    internal class Version1 : Information
     {
         public Version1(ref IO io)
             : base(ref io)
